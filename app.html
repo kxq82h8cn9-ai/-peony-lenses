@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>منصة التعلم الذكي — AI Edu</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Toast Container -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- ══════════════════════════════════════════════
+     AUTH SCREEN
+     ══════════════════════════════════════════════ -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <span class="logo-emoji">🧠</span>
+      <h1>منصة التعلم الذكي</h1>
+      <p>AI-Powered Educational Platform</p>
+    </div>
+
+    <div class="tab-switcher">
+      <button class="tab-btn auth-tab active" id="tab-login" onclick="switchAuthTab('login')">دخول</button>
+      <button class="tab-btn auth-tab" id="tab-register" onclick="switchAuthTab('register')">إنشاء حساب</button>
+    </div>
+
+    <!-- Login Form -->
+    <form id="form-login" onsubmit="handleLogin(event)">
+      <div class="input-group">
+        <label>البريد الإلكتروني</label>
+        <input id="login-email" type="email" class="input-field" placeholder="example@email.com" required>
+      </div>
+      <div class="input-group">
+        <label>كلمة المرور</label>
+        <input id="login-password" type="password" class="input-field" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn btn-primary">دخول →</button>
+    </form>
+
+    <!-- Register Form -->
+    <form id="form-register" class="hidden" onsubmit="handleRegister(event)">
+      <div class="input-group">
+        <label>الاسم الكامل</label>
+        <input id="reg-name" type="text" class="input-field" placeholder="اسمك الكريم" required>
+      </div>
+      <div class="input-group">
+        <label>البريد الإلكتروني</label>
+        <input id="reg-email" type="email" class="input-field" placeholder="example@email.com" required>
+      </div>
+      <div class="input-group">
+        <label>كلمة المرور</label>
+        <input id="reg-password" type="password" class="input-field" placeholder="كلمة مرور قوية" required minlength="6">
+      </div>
+      <div class="input-group">
+        <label>الدور</label>
+        <select id="reg-role" class="input-field select-field">
+          <option value="student">طالب</option>
+          <option value="teacher">معلم</option>
+          <option value="parent">ولي أمر</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">إنشاء الحساب →</button>
+    </form>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MAIN APP
+     ══════════════════════════════════════════════ -->
+<div id="app-root" class="hidden">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🧠</div>
+      <div>
+        <div style="font-weight:800;font-size:15px">AI Edu</div>
+        <div style="font-size:11px;opacity:.5">منصة التعلم الذكي</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">الرئيسية</div>
+      <div class="nav-item active" data-panel="chat" onclick="loadPanel('chat')">
+        <span class="nav-icon">💬</span> المحادثة التعليمية
+      </div>
+      <div class="nav-item" data-panel="files" onclick="loadPanel('files')">
+        <span class="nav-icon">📂</span> ملفاتي
+      </div>
+
+      <div class="nav-section">أدوات التعلم</div>
+      <div class="nav-item" data-panel="mindmap" onclick="loadPanel('mindmap')">
+        <span class="nav-icon">🗺️</span> الخرائط الذهنية
+      </div>
+      <div class="nav-item" data-panel="quiz" onclick="loadPanel('quiz')">
+        <span class="nav-icon">❓</span> الاختبارات
+      </div>
+      <div class="nav-item" data-panel="assessment" onclick="loadPanel('assessment')">
+        <span class="nav-icon">📋</span> التقييم الذاتي
+      </div>
+
+      <div class="nav-section">متابعة التقدم</div>
+      <div class="nav-item" data-panel="progress" onclick="loadPanel('progress')">
+        <span class="nav-icon">📊</span> تقدمي
+      </div>
+      <div class="nav-item" data-panel="rewards" onclick="loadPanel('rewards')">
+        <span class="nav-icon">🏆</span> مكافآتي
+      </div>
+      <div class="nav-item" data-panel="report" onclick="loadPanel('report')">
+        <span class="nav-icon">📄</span> التقارير
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar">👤</div>
+        <div class="user-info">
+          <div class="name" id="user-name">الطالب</div>
+          <div class="role" id="user-role">طالب</div>
+        </div>
+        <button class="btn btn-ghost btn-icon" onclick="logout()" title="خروج" style="margin-right:auto;color:rgba(255,255,255,.4)">↩</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Area -->
+  <div class="main-area">
+    <!-- Topbar -->
+    <div class="topbar">
+      <button class="btn btn-ghost btn-icon" onclick="toggleSidebar()" style="display:none" id="menu-btn">☰</button>
+      <div class="topbar-title" id="topbar-title">💬 المحادثة التعليمية</div>
+      <div class="topbar-actions">
+        <button class="btn btn-outline btn-sm" onclick="startScreenShare()" title="مشاركة الشاشة">📸 الشاشة</button>
+        <span id="screen-indicator" class="hidden" style="font-size:12px;color:var(--success);font-weight:700">● شاشة ملتقطة</span>
+        <button class="btn btn-ghost btn-icon" onclick="toggleTheme()">🌙</button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content-area">
+
+      <!-- ── CHAT PANEL ── -->
+      <div class="panel active" id="panel-chat">
+        <div class="chat-wrapper">
+
+          <!-- Chat Main -->
+          <div class="chat-main">
+            <div class="chat-header">
+              <div class="persona-badge" id="persona-icon">🎓</div>
+              <div class="chat-header-info">
+                <div class="name" id="persona-name">المعلم الذكي</div>
+                <div class="status">● متصل ومستعد للمساعدة</div>
+              </div>
+            </div>
+
+            <div id="chat-messages" class="chat-messages">
+              <div class="message ai">
+                <div class="message-avatar">🧠</div>
+                <div class="message-bubble">
+                  <strong>مرحباً! أنا معلمك الذكي 🎓</strong><br><br>
+                  يمكنني مساعدتك في:
+                  <br>• شرح الدروس وتبسيط المفاهيم الصعبة
+                  <br>• تلخيص الملفات والكتب المدرسية
+                  <br>• إنشاء خرائط ذهنية واختبارات
+                  <br>• البحث في المصادر العلمية الموثوقة
+                  <br>• مناقشة أي سؤال علمي أو ثقافي
+                  <br><br>ابدأ بطرح سؤالك! 💪
+                </div>
+              </div>
+            </div>
+
+            <div class="chat-input-area">
+              <div class="chat-input-row">
+                <textarea id="chat-input" class="input-field" placeholder="اكتب سؤالك هنا... (Shift+Enter لسطر جديد)" rows="1"></textarea>
+                <button class="btn btn-primary btn-icon" onclick="sendMessage()" title="إرسال">➤</button>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn btn-ghost btn-sm" onclick="quickAction('لخّص الموضوع في نقاط')">📝 تلخيص</button>
+                <button class="btn btn-ghost btn-sm" onclick="quickAction('اشرح هذا بأمثلة عملية')">💡 أمثلة</button>
+                <button class="btn btn-ghost btn-sm" onclick="generateMindMapFromChat()">🗺️ خريطة ذهنية</button>
+                <button class="btn btn-ghost btn-sm" onclick="quickAction('اطرح عليّ أسئلة مراجعة')">❓ مراجعة</button>
+                <button class="btn btn-ghost btn-sm" onclick="quickAction('ما هي المصادر العلمية الموثوقة لهذا الموضوع؟')">🔍 مصادر</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Sidebar -->
+          <div class="chat-sidebar">
+            <div class="card" style="padding:14px">
+              <div class="card-title" style="font-size:13px">🎭 اختر الشخصية</div>
+              <div id="persona-bar" class="persona-selector"></div>
+            </div>
+
+            <div class="card" style="padding:14px">
+              <div class="card-title" style="font-size:13px">📚 المادة الحالية</div>
+              <select class="input-field select-field" onchange="State.currentSubject=this.value" style="font-size:13px">
+                <option value="عام">عام</option>
+                <option value="تاريخ">تاريخ</option>
+                <option value="علوم">علوم</option>
+                <option value="رياضيات">رياضيات</option>
+                <option value="لغة عربية">لغة عربية</option>
+                <option value="لغة إنجليزية">لغة إنجليزية</option>
+                <option value="جغرافيا">جغرافيا</option>
+                <option value="فيزياء">فيزياء</option>
+                <option value="كيمياء">كيمياء</option>
+                <option value="أحياء">أحياء</option>
+              </select>
+            </div>
+
+            <div class="card" style="padding:14px">
+              <div class="card-title" style="font-size:13px">⚡ إجراءات سريعة</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <button class="btn btn-outline btn-sm w-full" onclick="loadPanel('quiz')">إنشاء اختبار</button>
+                <button class="btn btn-outline btn-sm w-full" onclick="loadPanel('mindmap')">خريطة ذهنية</button>
+                <button class="btn btn-outline btn-sm w-full" onclick="loadPanel('files')">رفع ملف</button>
+                <button class="btn btn-outline btn-sm w-full" onclick="generateReport()">تقرير أدائي</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── FILES PANEL ── -->
+      <div class="panel" id="panel-files">
+        <div class="card">
+          <div class="card-title">📂 رفع الملفات الدراسية</div>
+          <div id="upload-zone" class="upload-zone">
+            <div class="upload-icon">📎</div>
+            <div class="upload-text">اسحب الملفات هنا أو انقر للرفع</div>
+            <div class="upload-hint">PDF، صور، نصوص — الحد الأقصى 10MB</div>
+            <input id="file-input" type="file" multiple accept=".pdf,.txt,.png,.jpg,.jpeg,.webp,.md" style="display:none">
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">📋 الملفات المرفوعة</div>
+          <div id="file-list" class="file-list">
+            <p class="text-muted text-center">لا توجد ملفات مرفوعة بعد</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MINDMAP PANEL ── -->
+      <div class="panel" id="panel-mindmap">
+        <div class="card">
+          <div class="card-title">🗺️ توليد خريطة ذهنية جديدة</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <div style="flex:1;min-width:200px">
+              <input id="mm-topic" type="text" class="input-field" placeholder="موضوع الخريطة (مثال: الثورة الصناعية)">
+            </div>
+            <div style="flex:2;min-width:200px">
+              <input id="mm-content" type="text" class="input-field" placeholder="محتوى إضافي أو ملاحظات (اختياري)">
+            </div>
+            <button class="btn btn-primary" onclick="generateMindMap(document.getElementById('mm-topic').value, document.getElementById('mm-content').value)">
+              🗺️ توليد الخريطة
+            </button>
+          </div>
+        </div>
+
+        <div class="mindmap-container card" style="padding:0">
+          <div class="mindmap-toolbar">
+            <button class="btn btn-ghost btn-sm" onclick="resizeMindMap(-1)">−</button>
+            <button class="btn btn-ghost btn-sm" onclick="resizeMindMap(1)">+</button>
+            <button class="btn btn-ghost btn-sm" onclick="exportMindMap()">💾 تصدير</button>
+          </div>
+          <canvas id="mindmap-canvas"></canvas>
+          <div id="mindmap-empty" style="padding:60px;text-align:center;color:var(--text-muted)">
+            <div style="font-size:64px">🗺️</div>
+            <p>أنشئ خريطة ذهنية جديدة أو اختر واحدة محفوظة</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📚 الخرائط المحفوظة</div>
+          <div id="mindmap-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+            <p class="text-muted">جاري التحميل...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── QUIZ PANEL ── -->
+      <div class="panel" id="panel-quiz">
+        <div class="quiz-wrapper">
+
+          <!-- Setup -->
+          <div id="quiz-setup">
+            <div class="card">
+              <div class="card-title">❓ إنشاء اختبار جديد</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="input-group">
+                  <label>المادة</label>
+                  <input id="quiz-subject" type="text" class="input-field" placeholder="مثال: تاريخ، رياضيات">
+                </div>
+                <div class="input-group">
+                  <label>الموضوع</label>
+                  <input id="quiz-topic" type="text" class="input-field" placeholder="مثال: الحرب العالمية الثانية">
+                </div>
+                <div class="input-group">
+                  <label>نوع الأسئلة</label>
+                  <select id="quiz-type" class="input-field select-field">
+                    <option value="mcq">متعددة الخيارات</option>
+                    <option value="truefalse">صح / خطأ</option>
+                    <option value="short">إجابة قصيرة</option>
+                  </select>
+                </div>
+                <div class="input-group">
+                  <label>مستوى الصعوبة</label>
+                  <select id="quiz-difficulty" class="input-field select-field">
+                    <option value="easy">سهل</option>
+                    <option value="medium" selected>متوسط</option>
+                    <option value="hard">صعب</option>
+                  </select>
+                </div>
+                <div class="input-group">
+                  <label>عدد الأسئلة</label>
+                  <select id="quiz-count" class="input-field select-field">
+                    <option value="5" selected>5 أسئلة</option>
+                    <option value="10">10 أسئلة</option>
+                    <option value="15">15 سؤالاً</option>
+                    <option value="20">20 سؤالاً</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn btn-primary" onclick="generateQuiz()">⚡ توليد الاختبار</button>
+            </div>
+          </div>
+
+          <!-- Quiz Area -->
+          <div id="quiz-area" class="hidden">
+            <div class="quiz-header">
+              <div class="quiz-progress-info">
+                <span id="quiz-q-num">1 / 5</span>
+                <div class="quiz-timer" id="quiz-timer">05:00</div>
+              </div>
+              <div class="progress-bar" style="background:rgba(255,255,255,.3)">
+                <div class="progress-fill" id="quiz-progress-bar" style="width:20%;background:#fff"></div>
+              </div>
+            </div>
+            <div id="quiz-questions"></div>
+          </div>
+
+          <!-- Result -->
+          <div id="quiz-result" class="hidden">
+            <div class="quiz-result-card">
+              <div class="score-circle" id="score-circle">
+                <span id="score-value">0%</span>
+              </div>
+              <h2 style="margin-bottom:8px" id="result-correct">النتيجة</h2>
+              <p class="text-muted" id="result-feedback" style="margin-bottom:24px;max-width:500px;margin-left:auto;margin-right:auto"></p>
+              <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+                <button class="btn btn-primary" onclick="resetQuiz()">🔄 اختبار جديد</button>
+                <button class="btn btn-outline" onclick="loadPanel('progress')">📊 رؤية تقدمي</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PROGRESS PANEL ── -->
+      <div class="panel" id="panel-progress">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon blue">⭐</div>
+            <div><div class="stat-value" id="prog-points">0</div><div class="stat-label">إجمالي النقاط</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon purple">🏅</div>
+            <div><div class="stat-value" id="prog-level">1</div><div class="stat-label">المستوى الحالي</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon amber">📚</div>
+            <div><div class="stat-value" id="prog-sessions">0</div><div class="stat-label">الجلسات</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">🔥</div>
+            <div><div class="stat-value" id="prog-streak">0</div><div class="stat-label">أيام متتالية</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📈 تقدم المستوى</div>
+          <div class="progress-bar" style="height:12px">
+            <div class="progress-fill" id="level-progress" style="width:0%"></div>
+          </div>
+          <div class="text-sm text-muted mt-2" id="level-label">تحميل...</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📚 التقدم في المواد</div>
+          <div id="subject-progress-list" class="subject-progress-list">
+            <p class="text-muted text-center">ابدأ جلساتك لرؤية تقدمك!</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🛤️ مسار التعلم المقترح</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+            <select id="path-subject" class="input-field select-field" style="max-width:200px">
+              <option value="تاريخ">تاريخ</option>
+              <option value="علوم">علوم</option>
+              <option value="رياضيات">رياضيات</option>
+              <option value="لغة عربية">لغة عربية</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="loadLearningPath()">عرض المسار</button>
+          </div>
+          <div id="learning-path-content" class="text-muted text-sm">اختر مادة لعرض مسار التعلم المخصص لك</div>
+        </div>
+      </div>
+
+      <!-- ── REWARDS PANEL ── -->
+      <div class="panel" id="panel-rewards">
+        <div class="level-banner">
+          <div class="level-num" id="reward-level">1</div>
+          <div class="level-info">
+            <div class="title">🏆 بطل التعلم</div>
+            <div class="subtitle">استمر في التعلم لكسب المزيد من المكافآت!</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">🎖️ الشارات والمكافآت</div>
+          <div id="rewards-grid" class="rewards-grid">
+            <p class="text-muted text-center">أكمل مهاماً لكسب مكافآت! 🏆</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ASSESSMENT PANEL ── -->
+      <div class="panel" id="panel-assessment">
+        <div class="assessment-intro">
+          <div class="big-icon">📋</div>
+          <h2>نظام التقييم الذكي</h2>
+          <p>قيّم مستواك الحالي واكتشف نقاط قوتك ومجالات التطوير</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;max-width:800px;margin:0 auto">
+          <div class="input-group" style="grid-column:1/-1">
+            <label>اختر المادة</label>
+            <select id="assess-subject" class="input-field select-field" style="max-width:300px">
+              <option value="">— اختر المادة —</option>
+              <option>تاريخ</option><option>علوم</option><option>رياضيات</option>
+              <option>لغة عربية</option><option>فيزياء</option><option>كيمياء</option>
+            </select>
+          </div>
+
+          <div class="card" style="text-align:center;cursor:pointer" onclick="startAssessment('diagnostic')">
+            <div style="font-size:40px;margin-bottom:12px">🔍</div>
+            <div class="card-title">التقييم التشخيصي</div>
+            <p class="text-muted text-sm">قياس مستواك الحالي</p>
+          </div>
+          <div class="card" style="text-align:center;cursor:pointer" onclick="startAssessment('pre_test')">
+            <div style="font-size:40px;margin-bottom:12px">📝</div>
+            <div class="card-title">الاختبار القبلي</div>
+            <p class="text-muted text-sm">قبل بداية الدرس</p>
+          </div>
+          <div class="card" style="text-align:center;cursor:pointer" onclick="startAssessment('post_test')">
+            <div style="font-size:40px;margin-bottom:12px">✅</div>
+            <div class="card-title">الاختبار البعدي</div>
+            <p class="text-muted text-sm">بعد الانتهاء من الدرس</p>
+          </div>
+          <div class="card" style="text-align:center;cursor:pointer" onclick="startAssessment('intelligences')">
+            <div style="font-size:40px;margin-bottom:12px">🧩</div>
+            <div class="card-title">الذكاءات المتعددة</div>
+            <p class="text-muted text-sm">اكتشف نوع ذكاءك</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── REPORT PANEL ── -->
+      <div class="panel" id="panel-report">
+        <div class="card">
+          <div class="card-title">📊 إعداد التقرير التعليمي</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+            <select class="input-field select-field" id="report-period" style="max-width:180px">
+              <option value="7">آخر 7 أيام</option>
+              <option value="30">آخر 30 يوماً</option>
+              <option value="90">آخر 3 أشهر</option>
+            </select>
+            <button class="btn btn-primary" id="btn-gen-report"
+                    onclick="generateReport(parseInt(document.getElementById('report-period').value))">
+              📄 توليد التقرير
+            </button>
+          </div>
+          <div class="text-sm text-muted" id="report-date"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📝 محتوى التقرير</div>
+          <div id="report-content" class="report-content text-muted">
+            اضغط "توليد التقرير" لإنشاء تقرير مفصل عن تقدمك التعليمي...
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">📤 مشاركة التقرير</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-outline btn-sm" onclick="copyReport()">📋 نسخ التقرير</button>
+            <button class="btn btn-outline btn-sm" onclick="printReport()">🖨️ طباعة</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end content-area -->
+  </div><!-- end main-area -->
+</div><!-- end app-root -->
+
+<script src="/static/js/app.js"></script>
+<script>
+// Additional helper functions
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  html.dataset.theme = html.dataset.theme === 'dark' ? '' : 'dark';
+  localStorage.setItem('theme', html.dataset.theme);
+}
+
+function quickAction(text) {
+  document.getElementById('chat-input').value = text;
+  sendMessage();
+}
+
+function generateMindMapFromChat() {
+  const msgs = document.querySelectorAll('.message.ai .message-bubble');
+  const lastMsg = msgs[msgs.length - 1];
+  if (!lastMsg) { showToast('ابدأ محادثة أولاً', 'warning'); return; }
+  const topic = document.getElementById('chat-input').value || 'موضوع المحادثة';
+  const content = lastMsg.textContent.slice(0, 500);
+  generateMindMap(topic, content);
+}
+
+function resizeMindMap(dir) {
+  const canvas = document.getElementById('mindmap-canvas');
+  const currentH = canvas.height;
+  canvas.height = Math.max(300, currentH + dir * 100);
+  if (State.mindMapData) renderMindMap(State.mindMapData);
+}
+
+function exportMindMap() {
+  const canvas = document.getElementById('mindmap-canvas');
+  const link = document.createElement('a');
+  link.download = 'mindmap.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  showToast('تم تصدير الخريطة! 🗺️', 'success');
+}
+
+async function loadLearningPath() {
+  const subject = document.getElementById('path-subject').value;
+  const el = document.getElementById('learning-path-content');
+  el.innerHTML = '<p class="text-muted">جاري التحميل...</p>';
+  try {
+    const data = await apiFetch(`/api/learning-path/${encodeURIComponent(subject)}`);
+    el.innerHTML = `
+      <div style="margin-bottom:12px;font-weight:700;color:var(--primary)">${data.recommendation || ''}</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${(data.steps || []).map((s,i) => `
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:10px;background:var(--bg);border-radius:8px;border:1px solid var(--border)">
+            <div style="width:28px;height:28px;background:var(--primary);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">${i+1}</div>
+            <div>
+              <div style="font-weight:600;font-size:13px">${s.title}</div>
+              <div style="font-size:12px;color:var(--text-muted)">${s.description} · ${s.estimated_time}</div>
+            </div>
+          </div>`).join('')}
+      </div>`;
+  } catch (e) { el.innerHTML = `<p class="text-muted">تعذّر تحميل المسار: ${e.message}</p>`; }
+}
+
+function copyReport() {
+  const text = document.getElementById('report-content').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('تم نسخ التقرير!', 'success'));
+}
+
+function printReport() {
+  window.print();
+}
+
+// Restore theme
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+
+// Mobile menu button
+if (window.innerWidth < 768) document.getElementById('menu-btn').style.display = '';
+</script>
+</body>
+</html>

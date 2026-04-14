@@ -1,79 +1,137 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لينا لانسيز | Lina Lenses Luxury</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
-    <style>
-        :root { --gold: #D4AF37; --pink-light: #FFF0F5; --pink-dark: #F06292; }
-        body { font-family: 'Tajawal', sans-serif; background-color: #fff; color: #333; }
-        .victorian { font-family: 'Playfair Display', serif; color: var(--gold); }
-        .gold-button { background: linear-gradient(45deg, #D4AF37, #F9E4B7); transition: 0.3s; }
-        .gold-button:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(212,175,55,0.2); }
-        .lens-card { border: 1px solid #eee; border-radius: 25px; transition: 0.4s; background: white; }
-        .lens-card:hover { border-color: var(--gold); transform: translateY(-8px); }
-        .glass-nav { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Edu — منصة التعلم الذكي</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{direction:rtl;scroll-behavior:smooth}
+body{font-family:'Tajawal',sans-serif;background:#0f172a;color:#f1f5f9;line-height:1.7;overflow-x:hidden}
+:root{--p:#2563eb;--s:#7c3aed;--a:#f59e0b}
+.hero{min-height:100vh;background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(37,99,235,.15) 0%,transparent 70%);pointer-events:none}
+.logo{width:80px;height:80px;background:linear-gradient(135deg,var(--p),var(--s));border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 24px;box-shadow:0 20px 60px rgba(37,99,235,.4);animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.hero h1{font-size:clamp(32px,6vw,64px);font-weight:900;line-height:1.1;margin-bottom:16px;background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,.7) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero .sub{font-size:clamp(14px,2.5vw,18px);color:rgba(255,255,255,.6);max-width:600px;margin:0 auto 40px}
+.cta-group{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:12px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;border:none;text-decoration:none;transition:all .25s ease}
+.btn-primary{background:linear-gradient(135deg,var(--p),var(--s));color:#fff;box-shadow:0 8px 30px rgba(37,99,235,.4)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(37,99,235,.5)}
+.btn-outline{background:rgba(255,255,255,.06);color:#fff;border:1.5px solid rgba(255,255,255,.2)}
+.btn-outline:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.4)}
+.badge{display:inline-block;background:rgba(245,158,11,.15);color:var(--a);border:1px solid rgba(245,158,11,.3);border-radius:99px;padding:4px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;margin-bottom:20px}
+/* Features */
+.section{padding:80px 20px;text-align:center}
+.section-title{font-size:clamp(26px,4vw,42px);font-weight:900;margin-bottom:12px}
+.section-sub{color:rgba(255,255,255,.5);max-width:500px;margin:0 auto 50px;font-size:15px}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;max-width:1100px;margin:0 auto}
+.feature-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:28px;text-align:right;transition:all .3s ease;cursor:default}
+.feature-card:hover{background:rgba(255,255,255,.07);border-color:rgba(37,99,235,.4);transform:translateY(-6px)}
+.f-icon{font-size:40px;margin-bottom:14px;display:block}
+.f-title{font-size:17px;font-weight:700;margin-bottom:8px}
+.f-desc{font-size:13px;color:rgba(255,255,255,.5);line-height:1.7}
+/* Personas */
+.personas{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:40px}
+.persona{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:10px;transition:.25s}
+.persona:hover{border-color:var(--p);background:rgba(37,99,235,.1)}
+.persona-emoji{font-size:28px}
+.persona-text .name{font-weight:700;font-size:14px}
+.persona-text .desc{font-size:11px;color:rgba(255,255,255,.4)}
+/* Stats */
+.stats{display:flex;justify-content:center;gap:40px;flex-wrap:wrap;padding:40px 20px;background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06)}
+.stat{text-align:center}
+.stat-n{font-size:36px;font-weight:900;background:linear-gradient(135deg,var(--p),var(--s));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-l{font-size:13px;color:rgba(255,255,255,.4);margin-top:4px}
+/* Brain science */
+.brain-section{background:linear-gradient(135deg,rgba(37,99,235,.08),rgba(124,58,237,.08));border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05)}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;max-width:900px;margin:0 auto}
+.step{background:rgba(255,255,255,.04);border-radius:14px;padding:20px;text-align:center}
+.step-num{width:36px;height:36px;background:linear-gradient(135deg,var(--p),var(--s));border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;margin:0 auto 12px}
+.step-title{font-weight:700;font-size:14px;margin-bottom:6px}
+.step-desc{font-size:12px;color:rgba(255,255,255,.45)}
+/* CTA section */
+.cta-section{padding:80px 20px;text-align:center;background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(124,58,237,.12))}
+/* Footer */
+footer{padding:24px;text-align:center;color:rgba(255,255,255,.25);font-size:12px;border-top:1px solid rgba(255,255,255,.06)}
+</style>
 </head>
 <body>
 
-    <nav class="glass-nav sticky top-0 z-50 border-b border-pink-100 px-6 py-4 flex justify-between items-center text-center">
-        <div class="text-xl font-bold tracking-tighter">LINA <span class="victorian italic text-[#D4AF37]">Lenses</span></div>
-        <a href="https://wa.me/9647706008339" class="gold-button text-white text-xs px-5 py-2 rounded-full font-bold">اتصلي بنا</a>
-    </nav>
+<!-- Hero -->
+<section class="hero">
+  <div class="badge">🚀 مدعوم بـ Claude claude-opus-4-6 — أقوى ذكاء اصطناعي</div>
+  <div class="logo">🧠</div>
+  <h1>منصة التعلم الذكي</h1>
+  <p class="sub">تعلّم بأسلوب مخصص لعقلك — ذكاء اصطناعي يفهمك، يشرح لك، يُقيّمك، ويرافقك في كل خطوة</p>
+  <div class="cta-group">
+    <a href="/app" class="btn btn-primary">🎓 ابدأ التعلم الآن</a>
+    <a href="#features" class="btn btn-outline">تعرّف على الميزات</a>
+  </div>
+</section>
 
-    <header class="relative py-20 px-6 text-center overflow-hidden">
-        <div class="absolute top-0 left-0 w-full h-full -z-10 bg-[radial-gradient(circle_at_center,_var(--pink-light)_0%,_#fff_100%)]"></div>
-        <span class="victorian italic tracking-widest text-sm uppercase mb-3 block">The Royal Collection</span>
-        <h1 class="text-4xl font-bold leading-tight mb-4 text-gray-800">سحر النظرة.. <br><span class="text-pink-400 font-light">في كل لحظة</span></h1>
-        <p class="text-gray-500 text-sm mb-8 leading-relaxed">عدسات مختارة بعناية لراحة عينيكِ وأناقتكِ الفريدة.</p>
-        <div class="victorian italic text-lg border-y border-pink-200 py-3 mx-10 text-[#D4AF37]">Captivating Glances, Timeless Elegance</div>
-    </header>
+<!-- Stats -->
+<div class="stats">
+  <div class="stat"><div class="stat-n">5+</div><div class="stat-l">شخصيات AI متخصصة</div></div>
+  <div class="stat"><div class="stat-n">10+</div><div class="stat-l">أنواع أسئلة</div></div>
+  <div class="stat"><div class="stat-n">100%</div><div class="stat-l">مخصص لكل طالب</div></div>
+  <div class="stat"><div class="stat-n">∞</div><div class="stat-l">مصادر علمية محدّثة</div></div>
+</div>
 
-    <main class="container mx-auto px-6 py-12">
-        <h2 class="text-2xl font-bold mb-10 text-center border-b-2 border-pink-100 pb-4 inline-block mx-auto">تشكيلتنا المختارة</h2>
-        
-        <div class="grid grid-cols-1 gap-10">
-            
-            <div class="lens-card p-4 max-w-sm mx-auto shadow-sm">
-                <div class="relative h-64 bg-gray-50 rounded-2xl mb-6 flex items-center justify-center overflow-hidden shadow-inner">
-                    <img src="https://via.placeholder.com/400x400/FFF0F5/D4AF37?text=Rose+Quartz" alt="Lens" class="w-full h-full object-cover">
-                    <span class="absolute top-4 right-4 bg-white/90 text-pink-500 text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">الأكثر طلباً</span>
-                </div>
-                <div class="text-center">
-                    <h3 class="text-xl font-bold mb-1 text-gray-800">روز كوارتز (Rose Quartz)</h3>
-                    <p class="victorian italic font-bold text-sm mb-4 tracking-wider text-[#D4AF37]">Series: LN-77 Premium</p>
-                    
-                    <div class="bg-pink-50/50 rounded-xl p-4 grid grid-cols-2 gap-y-3 text-[11px] mb-6 border border-pink-100 font-serif">
-                        <div class="text-right border-l border-pink-200 pl-2 uppercase font-bold text-pink-400 italic">DIA: 14.2mm</div>
-                        <div class="text-right uppercase font-bold text-pink-400 italic">WATER: 42%</div>
-                        <div class="text-right border-l border-pink-200 pl-2 uppercase font-bold text-pink-400 italic">B.C: 8.6mm</div>
-                        <div class="text-right uppercase font-bold text-pink-400 italic">TYPE: Annual</div>
-                    </div>
-                    
-                    <a href="https://wa.me/9647706008339?text=مرحباً%20لينا،%20أريد%20طلب%20عدسة%20روز%20كوارتز%20موديل%20LN-77" 
-                       class="block w-full gold-button text-white py-4 rounded-2xl font-bold shadow-lg text-sm transition text-center">
-                        اطلبي عبر واتساب الآن
-                    </a>
-                </div>
-            </div>
+<!-- Features -->
+<section class="section" id="features">
+  <div class="section-title">كل ما تحتاجه في منصة واحدة</div>
+  <div class="section-sub">أدوات تعليمية متكاملة مدعومة بأحدث تقنيات الذكاء الاصطناعي</div>
+  <div class="features-grid">
+    <div class="feature-card"><span class="f-icon">💬</span><div class="f-title">محادثة ذكية</div><div class="f-desc">تحدّث مع AI يشرح ويناقش ويجيب عن أي سؤال بأسلوب المعلم المتخصص</div></div>
+    <div class="feature-card"><span class="f-icon">📂</span><div class="f-title">تحليل الملفات</div><div class="f-desc">ارفع كتبك ومذكراتك وسيقرأها الذكاء الاصطناعي ويحللها معك</div></div>
+    <div class="feature-card"><span class="f-icon">🖥️</span><div class="f-title">مشاركة الشاشة</div><div class="f-desc">شارك شاشتك والـ AI يرى ما تراه ويساعدك في الحل والفهم</div></div>
+    <div class="feature-card"><span class="f-icon">🗺️</span><div class="f-title">خرائط ذهنية</div><div class="f-desc">توليد تلقائي لخرائط ذهنية تفاعلية تُنظّم المعلومات بصرياً</div></div>
+    <div class="feature-card"><span class="f-icon">❓</span><div class="f-title">اختبارات ذكية</div><div class="f-desc">أسئلة متعددة الأنواع مع تقييم فوري وتغذية راجعة مفصّلة</div></div>
+    <div class="feature-card"><span class="f-icon">📊</span><div class="f-title">تتبع التقدم</div><div class="f-desc">لوحة تحكم تعرض تقدمك في كل مادة مع مقياس الإتقان والمهارات</div></div>
+    <div class="feature-card"><span class="f-icon">🏆</span><div class="f-title">نظام المكافآت</div><div class="f-desc">نقاط وشارات ومستويات تحفّزك على الاستمرار والتفوق</div></div>
+    <div class="feature-card"><span class="f-icon">🔍</span><div class="f-title">بحث علمي</div><div class="f-desc">وصول فوري لأحدث المصادر العلمية الموثوقة لإثراء الشرح</div></div>
+    <div class="feature-card"><span class="f-icon">📄</span><div class="f-title">تقارير مفصّلة</div><div class="f-desc">تقارير دورية للطالب وولي الأمر والمعلم بمؤشرات الأداء</div></div>
+  </div>
+</section>
 
-        </div>
-    </main>
+<!-- Personas -->
+<section class="section" style="background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.05)">
+  <div class="section-title">شخصيات AI متخصصة لكل مادة</div>
+  <div class="section-sub">كل مادة لها معلم ذكي بأسلوب خاص يناسب طبيعتها</div>
+  <div class="personas">
+    <div class="persona"><span class="persona-emoji">🎓</span><div class="persona-text"><div class="name">المعلم الذكي</div><div class="desc">معلم متعدد التخصصات</div></div></div>
+    <div class="persona"><span class="persona-emoji">📜</span><div class="persona-text"><div class="name">المؤرخ</div><div class="desc">التاريخ والحضارات</div></div></div>
+    <div class="persona"><span class="persona-emoji">🔬</span><div class="persona-text"><div class="name">العالِم</div><div class="desc">العلوم والأبحاث</div></div></div>
+    <div class="persona"><span class="persona-emoji">📐</span><div class="persona-text"><div class="name">الرياضياتي</div><div class="desc">الأرقام والمسائل</div></div></div>
+    <div class="persona"><span class="persona-emoji">🌍</span><div class="persona-text"><div class="name">اللغوي</div><div class="desc">اللغات والأدب</div></div></div>
+  </div>
+</section>
 
-    <footer class="bg-gray-50 py-12 px-6 text-center border-t border-pink-50">
-        <div class="victorian text-xl font-bold mb-4 text-[#D4AF37]">LINA LENSES</div>
-        <p class="text-gray-400 text-[10px] leading-relaxed max-w-xs mx-auto mb-6">
-            Designed for the modern woman who seeks comfort and luxury in every look.
-        </p>
-        <div class="flex justify-center space-x-reverse space-x-6 text-pink-300 text-xs mb-8 font-bold">
-            <a href="#">Instagram</a>
-            <a href="#">Snapchat</a>
-        </div>
-        <p class="text-[9px] text-gray-300 uppercase tracking-widest italic">© 2026 Crafted with Passion for LINA | Iraq</p>
-    </footer>
+<!-- Brain Science -->
+<section class="section brain-section">
+  <div class="section-title">🧠 مبني على علم الأعصاب</div>
+  <div class="section-sub">استراتيجيات علمية مثبتة لتحسين الاستيعاب وتقوية الذاكرة</div>
+  <div class="steps">
+    <div class="step"><div class="step-num">V</div><div class="step-title">تصوّر</div><div class="step-desc">خرائط ذهنية ومخططات بصرية لتفعيل نصف الدماغ الأيمن</div></div>
+    <div class="step"><div class="step-num">R</div><div class="step-title">اربط</div><div class="step-desc">ربط المعلومات الجديدة بما تعلّمته سابقاً لتعزيز الذاكرة</div></div>
+    <div class="step"><div class="step-num">P</div><div class="step-title">توقّع</div><div class="step-desc">أسئلة تنبؤية قبل الشرح لتنشيط الفضول والانتباه</div></div>
+    <div class="step"><div class="step-num">E</div><div class="step-title">جرّب</div><div class="step-desc">تطبيق عملي وأمثلة حياتية لترسيخ المعلومة</div></div>
+    <div class="step"><div class="step-num">R</div><div class="step-title">راجع</div><div class="step-desc">مراجعة متباعدة ذكية تمنع النسيان وتقوّي الذاكرة طويلة المدى</div></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div style="font-size:52px;margin-bottom:16px">🚀</div>
+  <div class="section-title">ابدأ رحلة التعلم الذكي اليوم</div>
+  <div class="section-sub" style="margin-bottom:32px">مجاني للبدء — لا تحتاج بطاقة ائتمانية</div>
+  <a href="/app" class="btn btn-primary" style="font-size:17px;padding:16px 40px">🎓 ابدأ التعلم الآن مجاناً</a>
+</section>
+
+<footer>© 2026 منصة التعلم الذكي — مبني بـ ❤️ للطلاب | Claude claude-opus-4-6 AI</footer>
 
 </body>
 </html>
