@@ -19,6 +19,7 @@ const State = {
   quizSeconds: 0,
   screenCapture: null,
   mindMapData: null,
+  _savedMaps: [],
 };
 
 // ── API Helper ─────────────────────────────────────────────────────────────────
@@ -460,17 +461,20 @@ async function loadMindMaps() {
     const list = document.getElementById('mindmap-list');
     if (!list) return;
     if (!maps.length) { list.innerHTML = '<p class="text-muted text-center">لا توجد خرائط بعد</p>'; return; }
-    list.innerHTML = maps.map(m => `
-      <div class="card" style="cursor:pointer" onclick='loadSavedMap(${JSON.stringify(m.map_data)})'>
-        <div class="card-title">🗺️ ${m.title}</div>
+    State._savedMaps = maps;
+    list.innerHTML = maps.map((m, i) => `
+      <div class="card" style="cursor:pointer" onclick="loadSavedMap(${i})">
+        <div class="card-title">🗺️ ${m.title.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
         <div class="text-sm text-muted">${m.subject} · ${new Date(m.created_at).toLocaleDateString('ar')}</div>
       </div>`).join('');
   } catch (e) {}
 }
 
-function loadSavedMap(mapData) {
+function loadSavedMap(idx) {
   try {
-    const data = typeof mapData === 'string' ? JSON.parse(mapData) : mapData;
+    const m = State._savedMaps && State._savedMaps[idx];
+    if (!m) return;
+    const data = typeof m.map_data === 'string' ? JSON.parse(m.map_data) : m.map_data;
     State.mindMapData = data;
     renderMindMap(data);
   } catch (e) {}
@@ -501,39 +505,42 @@ function startQuiz(data) {
   document.getElementById('quiz-area').classList.remove('hidden');
   document.getElementById('quiz-result').classList.add('hidden');
   State.quizSeconds = data.questions.length * 60;
-  renderQuizQuestion(0, data.questions);
+  renderQuizQuestion(0);
   startQuizTimer();
 }
 
-function renderQuizQuestion(idx, questions) {
+function renderQuizQuestion(idx) {
+  const questions = State.quizData.questions;
   const q = questions[idx];
   const total = questions.length;
   document.getElementById('quiz-q-num').textContent = `${idx+1} / ${total}`;
   document.getElementById('quiz-progress-bar').style.width = `${((idx+1)/total)*100}%`;
   const area = document.getElementById('quiz-questions');
+  const escapedOpts = (q.options || []).map(opt =>
+    opt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  );
   area.innerHTML = `
     <div class="question-card">
       <div class="question-number">السؤال ${idx+1} من ${total}</div>
-      <div class="question-text">${q.question}</div>
+      <div class="question-text">${q.question.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
       <div class="option-list">
-        ${(q.options || []).map((opt, oi) => `
+        ${escapedOpts.map((opt, oi) => `
           <div class="option-item ${State.quizAnswers[idx] === oi ? 'selected' : ''}"
-               onclick="selectAnswer(${idx},${oi},${total})">
+               onclick="selectAnswer(${idx},${oi})">
             <div class="option-letter">${['أ','ب','ج','د'][oi]}</div>
             <span>${opt}</span>
           </div>`).join('')}
       </div>
       <div class="flex gap-2 mt-4">
-        ${idx > 0 ? `<button class="btn btn-ghost" onclick="renderQuizQuestion(${idx-1},${JSON.stringify(questions).replace(/"/g,'&quot;')})">← السابق</button>` : ''}
-        ${idx < total-1 ? `<button class="btn btn-primary" onclick="renderQuizQuestion(${idx+1},${JSON.stringify(questions).replace(/"/g,'&quot;')})">التالي →</button>` : `<button class="btn btn-success" onclick="submitQuiz()">إنهاء الاختبار ✓</button>`}
+        ${idx > 0 ? `<button class="btn btn-ghost" onclick="renderQuizQuestion(${idx-1})">← السابق</button>` : ''}
+        ${idx < total-1 ? `<button class="btn btn-primary" onclick="renderQuizQuestion(${idx+1})">التالي →</button>` : `<button class="btn btn-success" onclick="submitQuiz()">إنهاء الاختبار ✓</button>`}
       </div>
     </div>`;
 }
 
 function selectAnswer(qIdx, optIdx) {
   State.quizAnswers[qIdx] = optIdx;
-  const questions = State.quizData.questions;
-  renderQuizQuestion(qIdx, questions);
+  renderQuizQuestion(qIdx);
 }
 
 function startQuizTimer() {
