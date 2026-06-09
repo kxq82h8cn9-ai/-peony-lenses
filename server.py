@@ -149,9 +149,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="AI Educational Platform", version="1.1.0", lifespan=lifespan)
 
+_ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:8000,http://127.0.0.1:8000").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -235,6 +236,12 @@ async def get_sessions(user=Depends(get_current_user)):
 
 @app.get("/api/sessions/{session_id}/messages")
 async def get_messages(session_id: int, user=Depends(get_current_user)):
+    conn = db.get_connection()
+    owned = conn.execute("SELECT id FROM sessions WHERE id=? AND user_id=?",
+                         (session_id, user["id"])).fetchone()
+    conn.close()
+    if not owned:
+        raise HTTPException(403, "Access denied")
     return db.get_session_messages(session_id)
 
 # ─── Chat Streaming ────────────────────────────────────────────────────────────
@@ -543,7 +550,8 @@ class QuizSubmitRequest(BaseModel):
 async def submit_quiz(req: QuizSubmitRequest, user=Depends(get_current_user)):
     client = get_claude()
     conn = db.get_connection()
-    quiz = conn.execute("SELECT * FROM quizzes WHERE id=?", (req.quiz_id,)).fetchone()
+    quiz = conn.execute("SELECT * FROM quizzes WHERE id=? AND user_id=?",
+                        (req.quiz_id, user["id"])).fetchone()
     conn.close()
     if not quiz:
         raise HTTPException(404, "الاختبار غير موجود")
@@ -673,8 +681,9 @@ async def generate_report(period_days: int = 7, user=Depends(get_current_user)):
 
 الأسلوب: احترافي مشجع، يُظهر الاهتمام بتطور الطالب."""
 
-    # Use thinking for deep analysis on reports
-    response = client.messages.create(
+    import asyncio
+    response = await asyncio.to_thread(
+        client.messages.create,
         model="claude-opus-4-6",
         max_tokens=2000,
         thinking={"type": "adaptive"},

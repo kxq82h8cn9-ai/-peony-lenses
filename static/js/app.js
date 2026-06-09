@@ -40,7 +40,12 @@ function showToast(msg, type = 'info', duration = 3500) {
   const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
   const el = document.createElement('div');
   el.className = `toast ${type}`;
-  el.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
+  const iconSpan = document.createElement('span');
+  iconSpan.textContent = icons[type] || 'ℹ️';
+  const msgSpan = document.createElement('span');
+  msgSpan.textContent = msg;
+  el.appendChild(iconSpan);
+  el.appendChild(msgSpan);
   container.appendChild(el);
   setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateY(-20px)'; setTimeout(() => el.remove(), 400); }, duration);
 }
@@ -102,13 +107,13 @@ function showAuthScreen() {
   document.getElementById('app-root').classList.add('hidden');
 }
 
-function showApp() {
+async function showApp() {
   document.getElementById('auth-screen').classList.add('hidden');
   document.getElementById('app-root').classList.remove('hidden');
   document.getElementById('user-name').textContent = State.user?.name || 'الطالب';
   document.getElementById('user-role').textContent = roleLabel(State.user?.role);
   loadPanel('chat');
-  initChatSession();
+  await initChatSession();
 }
 
 function roleLabel(r) {
@@ -255,6 +260,8 @@ async function sendMessage() {
             fullText += evt.content;
             bubble.innerHTML = formatMessage(fullText);
             document.getElementById('chat-messages').scrollTop = 99999;
+          } else if (evt.type === 'error') {
+            appendMessage('ai', `⚠️ ${evt.content || 'حدث خطأ في الاتصال'}`);
           }
         } catch (_) {}
       }
@@ -312,10 +319,14 @@ async function uploadFile(file) {
       headers: { 'Authorization': `Bearer ${State.token}` },
       body: form,
     });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: res.statusText }));
+      throw new Error(err.detail || 'فشل رفع الملف');
+    }
     const data = await res.json();
     State.uploadedFiles.unshift(data);
     renderFileList();
-    showToast(`✅ تم رفع ${file.name}`, 'success');
+    showToast(`تم رفع ${file.name}`, 'success');
   } catch (e) { showToast('فشل رفع الملف: ' + e.message, 'error'); }
 }
 
@@ -603,7 +614,7 @@ function renderProgressDashboard(data) {
   document.getElementById('prog-streak').textContent = profile.streak_days || 0;
 
   // Level progress bar
-  const nextPts = data.next_level_points || 100;
+  const nextPts = data.next_level_points ?? 100;
   const pct = Math.max(0, Math.min(100, 100 - (nextPts / 100 * 100)));
   document.getElementById('level-progress').style.width = pct + '%';
   document.getElementById('level-label').textContent = `المستوى ${lvl} — يحتاج ${nextPts} نقطة للمستوى التالي`;
