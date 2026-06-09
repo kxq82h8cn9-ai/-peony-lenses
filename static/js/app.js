@@ -22,6 +22,11 @@ const State = {
   _savedMaps: [],
 };
 
+// ── HTML Escape Helper ─────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 // ── API Helper ─────────────────────────────────────────────────────────────────
 async function apiFetch(path, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...options.headers };
@@ -224,8 +229,17 @@ async function sendMessage() {
     const headers = { 'Content-Type': 'application/json' };
     if (State.token) headers['Authorization'] = `Bearer ${State.token}`;
 
+    if (!State.currentSession) {
+      showToast('لا توجد جلسة نشطة، جاري إنشاء جلسة جديدة...', 'info');
+      await initChatSession();
+      if (!State.currentSession) {
+        showToast('فشل إنشاء الجلسة. تحقق من اتصالك.', 'error');
+        typingEl.remove();
+        return;
+      }
+    }
     const body = {
-      session_id: State.currentSession || 1,
+      session_id: State.currentSession,
       message: text,
       persona: State.currentPersona,
       screen_image: State.screenCapture || null,
@@ -235,6 +249,11 @@ async function sendMessage() {
     const res = await fetch(`${API}/api/chat`, {
       method: 'POST', headers, body: JSON.stringify(body),
     });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({ detail: res.statusText }));
+      throw new Error(errData.detail || `HTTP ${res.status}`);
+    }
 
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
@@ -342,7 +361,7 @@ function renderFileList() {
     <div class="file-item">
       <span class="file-icon">${icons[f.type] || '📎'}</span>
       <div class="file-info">
-        <div class="name">${f.filename}</div>
+        <div class="name">${esc(f.filename)}</div>
         <div class="size">${formatSize(f.size)}</div>
       </div>
       <div class="file-actions">
@@ -475,8 +494,8 @@ async function loadMindMaps() {
     State._savedMaps = maps;
     list.innerHTML = maps.map((m, i) => `
       <div class="card" style="cursor:pointer" onclick="loadSavedMap(${i})">
-        <div class="card-title">🗺️ ${m.title.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
-        <div class="text-sm text-muted">${m.subject} · ${new Date(m.created_at).toLocaleDateString('ar')}</div>
+        <div class="card-title">🗺️ ${esc(m.title)}</div>
+        <div class="text-sm text-muted">${esc(m.subject)} · ${new Date(m.created_at).toLocaleDateString('ar')}</div>
       </div>`).join('');
   } catch (e) {}
 }
@@ -628,7 +647,7 @@ function renderProgressDashboard(data) {
     return `
     <div class="subject-progress-item">
       <div class="sp-header">
-        <span class="sp-name">📚 ${p.subject}</span>
+        <span class="sp-name">📚 ${esc(p.subject)}</span>
         <span class="sp-pct">${pct}%</span>
       </div>
       <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
@@ -647,9 +666,9 @@ async function loadRewards() {
     if (!rewards.length) { grid.innerHTML = '<p class="text-muted text-center">أكمل مهاماً لكسب مكافآت! 🏆</p>'; return; }
     grid.innerHTML = rewards.map(r => `
       <div class="badge-card">
-        <span class="badge-icon">${r.badge_icon || '⭐'}</span>
-        <div class="badge-name">${r.name}</div>
-        <div class="badge-pts">+${r.points} نقطة</div>
+        <span class="badge-icon">${esc(r.badge_icon || '⭐')}</span>
+        <div class="badge-name">${esc(r.name)}</div>
+        <div class="badge-pts">+${Number(r.points)} نقطة</div>
         <div class="text-sm text-muted">${new Date(r.awarded_at).toLocaleDateString('ar')}</div>
       </div>`).join('');
   } catch (e) {}
